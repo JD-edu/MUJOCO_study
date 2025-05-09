@@ -1,0 +1,115 @@
+<mujoco>
+	<option gravity="0 0 -9.81" />
+	<worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+		<geom type="plane" size="5 5 0.1" rgba=".9 .9 .9 1"/>
+		<body name = "chassis" pos="0 0 0.2" euler='0 90 0'>
+			<joint type="free"/>
+			<geom type="box" size=".05 .2 .5" rgba=".9 .9 0 1"/>
+			<site name="marker" pos = "0 0 0.1" size="0.1" />
+<!-- 
+🎯 What is the <site> tag?
+The <site> tag defines a point or frame in the model that:
+
+✅ Can be visualized (like a dot or marker)
+
+✅ Can be used as a sensor target
+
+✅ Can serve as a constraint or reference for controllers, cameras, etc.
+
+🔍 In Your Specific Code
+xml
+복사
+편집
+<site name="marker" pos="0 0 0.1" size="0.1" />
+🧭 This defines a site named "marker"
+
+Located at (0, 0, 0.1) relative to its parent body (chassis)
+
+The size 0.1 affects visual rendering (a sphere will be drawn there)
+
+🧪 Why is it useful?
+1. For sensing (like in your <sensor> tag):
+
+<sensor>
+    <framepos objtype="site" objname="marker"/>
+</sensor>
+This creates a sensor that measures the position of the site in world coordinates → it will be available in data.sensordata.
+So you can use it to:
+Track end-effector or object position
+Log the path of a robot or marker
+Use as a reward signal in reinforcement learning
+2. For visualization
+Sites are shown in the simulator as small spheres or crosses. They're helpful to:
+Mark key points on the robot (e.g., gripper tip, center of mass)
+Debug motion and control
+3. For control and computation
+You can programmatically use data.site_xpos['marker'] to:
+Know where your robot is
+Control motion toward a goal
+Attach a camera
+✅ Summary: What does <site> do?
+Role	Use Case
+📍 Marker	Visual reference in viewer
+📏 Sensor target	Track positions, orientations, velocities
+🧠 Control reference	Use site position in controllers or reward functions
+🔧 Geometry anchor	Define points for constraints or force applications
+-->
+			<body name="left-tire" pos="0 0.3 -0.5" euler='90 0 0'>
+				<joint name = "left-wheel" type="hinge" axis="0 0 -1"/>
+				<geom type="cylinder" size=".2 0.05" rgba="0 .9 0 1"/>
+			</body>
+			<body name="right-tire" pos="0 -0.3 -0.5" euler='90 0 0'>
+				<joint name = "right-wheel" type="hinge" axis="0 0 -1"/>
+				<geom type="cylinder" size=".2 0.05" rgba="0 .9 0 1"/>
+			</body>
+		</body>
+	</worldbody>
+	<sensor>
+		<framepos objtype="site" objname="marker"/>
+	</sensor>
+	<actuator>
+
+<!-- 
+🔧 The <actuator> Block
+<actuator>
+    <velocity name="left-velocity-servo" joint="left-wheel" kv="100"/>
+    <velocity name="right-velocity-servo" joint="right-wheel" kv="100"/>
+</actuator>
+This defines velocity servos (a type of actuator) that control the wheel joints of your robot.
+🧠 What does a <velocity> actuator do?
+A velocity actuator is a servo motor that tries to make the joint rotate at a desired velocity.
+It receives a control input (data.ctrl[]) as a target velocity, and applies torque automatically to make the joint follow that velocity.
+You don't directly specify torques — MuJoCo computes the torque needed based on the error.
+🧩 Parameter Explanation
+🦾 joint="left-wheel"
+The name of the joint being controlled — in this case, a hinge joint for the left wheel.
+⚙️ kv="100"
+Gain of the velocity servo.
+This determines how aggressively the actuator tries to match the desired velocity.
+Higher kv = faster, stronger correction (but risk of instability if too high).
+It's like a P controller: torque ∝ kv * (target_velocity - actual_velocity)
+🏷️ name="left-velocity-servo"
+Just a name so you can refer to this actuator in code (model.actuator(name) or data.ctrl[index])
+🧪 What happens during simulation?
+Let’s say you do:
+
+data.ctrl[0] = 2.0  # set left wheel to 2 rad/s
+data.ctrl[1] = -2.0 # set right wheel to -2 rad/s
+Then:
+The left wheel will rotate forward at ~2 rad/s.
+The right wheel will rotate backward at ~2 rad/s.
+This results in a spinning motion (like tank turn).
+✅ Summary
+
+Tag	Meaning
+<velocity>	Servo that applies torque to achieve desired joint speed
+joint="left-wheel"	Controls the left-wheel hinge joint
+kv="100"	Gain (higher = stronger correction)
+data.ctrl[]	Where you write the target velocity during simulation
+
+-->
+		<velocity name="left-velocity-servo" joint="left-wheel" kv="100"/>
+		<velocity name="right-velocity-servo" joint="right-wheel" kv="100"/>
+	</actuator>
+</mujoco>
