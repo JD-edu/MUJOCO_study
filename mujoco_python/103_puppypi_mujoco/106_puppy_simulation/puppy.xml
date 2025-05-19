@@ -13,6 +13,13 @@
     </default>
   </default>
 
+    <keyframe>
+    <key name="stand"
+        qpos="0 0 0 1 0 0 0 
+              0  0  0  0  0  0  0  0"
+        ctrl="0 0 0 0 0 0  0 0" />
+  </keyframe>
+
   <asset>
     <mesh name="lidar_Link" content_type="model/stl" file="lidar_Link.STL" />
     <mesh name="base_link" content_type="model/stl" file="base_link.STL" />
@@ -36,7 +43,7 @@
     <!--<geom name="ground" type="plane" pos="0 0 0" size="100 100 0.001" quat="1 0 0 0" material="matplane" condim="3" conaffinity="15" />-->
     <camera name="fixed" pos="0 -3.0 0.5208112658029593" xyaxes="1 0 0 0 0 1" />
     <camera name="track" mode="trackcom" pos="0 -3.0 0.5208112658029593" xyaxes="1 0 0 0 0 1" />
-    <body name="root" pos="0 0 0.020811265802959306" quat="1 0 0 0">
+    <body name="root" pos="0 0 0.120811265802959306" quat="1 0 0 0">
       <freejoint name="root" />
       <site name="imu" size="0.01" pos="0 0 0" />
       <geom pos="0 0 0.11" quat="0.707388 0 0 0.706825" type="mesh" rgba="0 0 0 1" mesh="base_link" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
@@ -50,13 +57,21 @@
       <body name="lb_link1" pos="-0.0778358 0.0420726 0.125988" quat="0.657971 -0.259755 -0.259548 0.657447">
         <inertial pos="0.0139911 0.0129617 -0.0150641" quat="0.681953 0.285067 -0.259509 0.621555" mass="0.0101535" diaginertia="5.0547e-06 4.74867e-06 7.53492e-07" />
         <!-- <joint name="lb_joint1" pos="0 0 0" axis="0 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-        <joint name="lb_joint1" pos="0 0 0" axis="1 0 0" range="-1.5708 3.4907" actuatorfrcrange="-0.5 0.5" />
+        <!--
+            axis="1 0 0": This is direction of attached axis. IF you set wrong value, robot arm is attached as distorted.
+            range="-1.57 3,4" As radian, joint move angle. 
+            This joint is hip. 
+        -->
+        <joint name="lb_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
         <geom type="mesh" rgba="0 0 0 1" mesh="lb_link1" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
         <geom type="mesh" rgba="0 0 0 1" mesh="lb_link1" />
         <body name="lb_link2" pos="0.0120499 0.0525236 -0.0528775">
           <inertial pos="0.000397966 -0.0498531 -0.0493138" quat="0.928207 -0.35834 0.0601905 0.0800115" mass="0.0445559" diaginertia="1.15934e-05 1.14772e-05 2.56752e-07" />
           <!--<joint name="lb_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-          <joint name="lb_joint2" pos="0 0 0" axis="1 0 0" range="-2.7227 -0.83776" actuatorfrcrange="-0.5 0.5" />
+          <!--
+              This joint is knee.
+          -->
+          <joint name="lb_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
           <geom type="mesh" rgba="0 0 0 1" mesh="lb_link2" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
           <geom type="mesh" rgba="0 0 0 1" mesh="lb_link2" />
           <geom size="0.0095 0.005" pos="0.0032 -0.0537033 -0.0522891" quat="0.65427 0.268941 0.653749 0.268727" type="cylinder" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
@@ -68,13 +83,13 @@
       <body name="rb_link1" pos="-0.0779027 -0.0419485 0.125988" quat="0.657971 -0.259755 -0.259548 0.657447">
         <inertial pos="-0.0139912 0.0129616 -0.0150641" quat="0.621547 0.25951 -0.285066 0.681961" mass="0.0101536" diaginertia="5.05471e-06 4.74867e-06 7.53497e-07" />
         <!--<joint name="rb_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-        <joint name="rb_joint1" pos="0 0 0" axis="1 0 0" range="-1.5708 3.4907" actuatorfrcrange="-0.5 0.5" />
+        <joint name="rb_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
         <geom type="mesh" rgba="0 0 0 1" mesh="rb_link1" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
         <geom type="mesh" rgba="0 0 0 1" mesh="rb_link1" />
         <body name="rb_link2" pos="-0.0185499 0.0525236 -0.0528775">
           <inertial pos="0.000397966 -0.0498531 -0.0493138" quat="0.928207 -0.35834 0.0601905 0.0800115" mass="0.0445559" diaginertia="1.15934e-05 1.14772e-05 2.56752e-07" />
           <!--<joint name="rb_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-          <joint name="rb_joint2" pos="0 0 0" axis="1 0 0" range="-2.7227 -0.83776" actuatorfrcrange="-0.5 0.5" />
+          <joint name="rb_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
           <geom type="mesh" rgba="0 0 0 1" mesh="rb_link2" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
           <geom type="mesh" rgba="0 0 0 1" mesh="rb_link2" />
           <geom size="0.0095 0.005" pos="0.0032 -0.0537033 -0.0522891" quat="0.65427 0.268941 0.653749 0.268727" type="cylinder" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
@@ -85,13 +100,13 @@
       <body name="rf_link1" pos="0.0778358 -0.0420725 0.120651" quat="0.657971 -0.259755 -0.259548 0.657447">
         <inertial pos="-0.0139912 0.0129616 -0.0150641" quat="0.621547 0.25951 -0.285066 0.681961" mass="0.0101536" diaginertia="5.05471e-06 4.74867e-06 7.53497e-07" />
         <!--<joint name="rf_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-        <joint name="rf_joint1" pos="0 0 0" axis="1 0 0" range="-1.5708 3.4907" actuatorfrcrange="-0.5 0.5" />
+        <joint name="rf_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
         <geom type="mesh" rgba="0 0 0 1" mesh="rf_link1" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
         <geom type="mesh" rgba="0 0 0 1" mesh="rf_link1" />
         <body name="rf_link2" pos="-0.0185499 0.0525236 -0.0528775">
           <inertial pos="0.000397966 -0.0498531 -0.0493138" quat="0.928207 -0.35834 0.0601905 0.0800115" mass="0.0445559" diaginertia="1.15934e-05 1.14772e-05 2.56752e-07" />
           <!--<joint name="rf_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-          <joint name="rf_joint2" pos="0 0 0" axis="1 0 0" range="-2.7227 -0.83776" actuatorfrcrange="-0.5 0.5" />
+          <joint name="rf_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
           <geom type="mesh" rgba="0 0 0 1" mesh="rf_link2" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
           <geom type="mesh" rgba="0 0 0 1" mesh="rf_link2" />
           <geom size="0.0095 0.005" pos="0.0032 -0.0537033 -0.0522891" quat="0.65427 0.268941 0.653749 0.268727" type="cylinder" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
@@ -102,13 +117,13 @@
       <body name="lf_link1" pos="0.0779027 0.0419485 0.120651" quat="0.657971 -0.259755 -0.259548 0.657447">
         <inertial pos="0.0139911 0.0129616 -0.0150641" quat="0.681953 0.285067 -0.259509 0.621556" mass="0.0101536" diaginertia="5.05473e-06 4.74868e-06 7.53497e-07" />
         <!--<joint name="lf_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-        <joint name="lf_joint1" pos="0 0 0" axis="1 0 0" range="-1.5708 3.4907" actuatorfrcrange="-0.5 0.5" />
+        <joint name="lf_joint1" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
         <geom type="mesh" rgba="0 0 0 1" mesh="lf_link1" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
         <geom type="mesh" rgba="0 0 0 1" mesh="lf_link1" />
         <body name="lf_link2" pos="0.0120499 0.0525236 -0.0528775">
           <inertial pos="0.000397966 -0.0498531 -0.0493138" quat="0.928207 -0.35834 0.0601905 0.0800115" mass="0.0445559" diaginertia="1.15934e-05 1.14772e-05 2.56752e-07" />
           <!--<joint name="lf_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
-          <joint name="lf_joint2" pos="0 0 0" axis="1 0 0" range="-2.7227 -0.83776" actuatorfrcrange="-0.5 0.5" />
+          <joint name="lf_joint2" pos="0 0 0" axis="1 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />
           <geom type="mesh" rgba="0 0 0 1" mesh="lf_link2" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
           <geom type="mesh" rgba="0 0 0 1" mesh="lf_link2" />
           <geom size="0.0095 0.005" pos="0.0032 -0.0537033 -0.0522891" quat="0.65427 0.268941 0.653749 0.268727" type="cylinder" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
@@ -158,10 +173,5 @@
     <gyro name="angular-velocity" site="imu" noise="0.005" cutoff="34.9" />
   </sensor>
 
-  <keyframe>
-    <key name="stand"
-        qpos="0 0 0.15 1 0 0 0 
-              0.2 -1.0  0.2 -1.0  0.2 -1.0  0.2 -1.0"
-        ctrl="0.2 -1.0  0.2 -1.0  0.2 -1.0  0.2 -1.0" />
-  </keyframe>
+
 </mujoco>

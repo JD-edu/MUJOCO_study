@@ -3,6 +3,7 @@ from mujoco.glfw import glfw
 import numpy as np
 import os 
 from scipy.spatial.transform import Rotation as R
+import time 
 
 #xml_path = "puppy.xml"
 xml_path = "scene.xml"
@@ -146,7 +147,15 @@ def mouse_move(window, xpos, ypos):
 def scroll(window, xoffset, yoffset):
     action = mj.mjtMouse.mjMOUSE_ZOOM
     mj.mjv_moveCamera(model, action, 0.0, -0.05 *
-                      yoffset, scene, cam)
+                      yoffset, scene, cam)    
+    
+desired_positions = np.array([
+    0,  -0.8,   # Front Left
+    0,  -0.8,   # Front Right
+    0,  -0.8,   # Rear Left
+    0,  -0.8,   # Rear Right
+])
+
 
 #get the full path
 dirname = os.path.dirname(__file__)
@@ -184,21 +193,88 @@ init_controller(model,data)
 mj.set_mjcb_control(controller)
 check_model_data()
 
+kp = 100.0  # Position gain
+kd = 2.0 # 2.0   # Damping gain
+
+key_id = mj.mj_name2id(model, mj.mjtObj.mjOBJ_KEY, "stand")
+mj.mj_resetDataKeyframe(model, data, key_id)
+
+print("Initial joint angles (qpos):", data.qpos[7:])
+qq = -2.7
 while not glfw.window_should_close(window):
     time_prev = data.time
-    #for i in range(model.nu):
-    #        data.ctrl[i] += 0.1
-    #        if data.ctrl[i] > 1.57:
-    #            data.ctrl[i] = -1.57
-    #print(data.ctrl[0])
-    target_angle = 0.5 * np.sin(2 * np.pi * 0.5 * data.time)
+    '''
+    <sensor>
+        <actuatorpos name="lb_joint1_p" actuator="lb_joint1" />
+        <actuatorvel name="lb_joint1_v" actuator="lb_joint1" />
+        <actuatorfrc name="lb_joint1_f" actuator="lb_joint1" noise="0.001" />
+        <actuatorpos name="lb_joint2_p" actuator="lb_joint2" />
+        <actuatorvel name="lb_joint2_v" actuator="lb_joint2" />
+        <actuatorfrc name="lb_joint2_f" actuator="lb_joint2" noise="0.001" />
+        <actuatorpos name="rb_joint1_p" actuator="rb_joint1" />
+        <actuatorvel name="rb_joint1_v" actuator="rb_joint1" />
+        <actuatorfrc name="rb_joint1_f" actuator="rb_joint1" noise="0.001" />
+        <actuatorpos name="rb_joint2_p" actuator="rb_joint2" />
+        <actuatorvel name="rb_joint2_v" actuator="rb_joint2" />
+        <actuatorfrc name="rb_joint2_f" actuator="rb_joint2" noise="0.001" />
+        <actuatorpos name="rf_joint1_p" actuator="rf_joint1" />
+        <actuatorvel name="rf_joint1_v" actuator="rf_joint1" />
+        <actuatorfrc name="rf_joint1_f" actuator="rf_joint1" noise="0.001" />
+        <actuatorpos name="rf_joint2_p" actuator="rf_joint2" />
+        <actuatorvel name="rf_joint2_v" actuator="rf_joint2" />
+        <actuatorfrc name="rf_joint2_f" actuator="rf_joint2" noise="0.001" />
+        <actuatorpos name="lf_joint1_p" actuator="lf_joint1" />
+        <actuatorvel name="lf_joint1_v" actuator="lf_joint1" />
+        <actuatorfrc name="lf_joint1_f" actuator="lf_joint1" noise="0.001" />
+        <actuatorpos name="lf_joint2_p" actuator="lf_joint2" />
+        <actuatorvel name="lf_joint2_v" actuator="lf_joint2" />
+        <actuatorfrc name="lf_joint2_f" actuator="lf_joint2" noise="0.001" />
+        <framequat name="orientation" objtype="site" noise="0.001" objname="imu" />
+        <gyro name="angular-velocity" site="imu" noise="0.005" cutoff="34.9" />
+    </sensor>
 
+    Above sensor tag, parameter arrignment 
+    
+    actuatorpos
+    actuatorvel
+    actuatorfrc... 
+    So below code is different from Unitree Go2 
+    '''
+    print("=======")
+    #qq += 0.1
+    #if qq > 2:
+    #    qq = -2 
+    qq = 0.2
+    desired_positions = np.array([
+        qq,  0.5,   # Front Left  first value:hip second value:knee 
+        qq,  0.5,   # Front Right
+        qq,  0.5,   # Rear Left
+        qq,  0.5,   # Rear Right
+    ])
+    print(qq)
     for i in range(model.nu):
-        #data.ctrl[i] = target_angle
-        pass
+        #qpos = data.sensordata[i*3]        # Sensor data: joint angle
+        #qvel = data.sensordata[i*3+1]  # Sensor data: joint velocity
+        #torque = kp * (desired_positions[i] - qpos) + kd * (0.0 - qvel)
+        #data.ctrl[i] = torque
+        joint_id = model.actuator_trnid[i][0]
+        qpos_adr = model.jnt_qposadr[joint_id]
+        qvel_adr = model.jnt_dofadr[joint_id]
+        qpos = data.qpos[qpos_adr]
+        qvel = data.qvel[qvel_adr]
+        torque = kp * (desired_positions[i] - qpos) + kd * (0.0 - qvel)
+        data.ctrl[i] = torque
+        #print(data.qpos[qpos_adr])
+        #print(data.ctrl[i])
+    #print("current joint angle (qpos):", data.qpos[7:])
+    #print("ctrl :", data.ctrl)
+    #for i in range(model.nu):
+    #    joint_id = model.actuator_trnid[i][0]
+    #    axis = model.jnt_axis[joint_id]
+    #    print(f"Joint {i} axis: {axis}")
+
 
     while (data.time - time_prev < 1.0/60.0):
-    
         mj.mj_step(model, data)
 
     #quat = np.array([data.qpos[3],data.qpos[4],data.qpos[5],data.qpos[6]])

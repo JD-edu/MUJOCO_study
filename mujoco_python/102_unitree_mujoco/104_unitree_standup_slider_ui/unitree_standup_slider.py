@@ -192,6 +192,7 @@ while not glfw.window_should_close(window):
         pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
         torque = kp * pos_error - kd * qvel
         data.ctrl[i] = torque
+        print(desired_positions[1])
         #else:
         #    data.ctrl[i] = 0
 

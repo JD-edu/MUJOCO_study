@@ -43,12 +43,8 @@ s5 = Slider(10, 210, 0.73)
 s6 = Slider(10, 250, 0.05)
 s7 = Slider(10, 290, 0.5)
 s8 = Slider(10, 330, 0.73)
-s9 = Slider(10, 370, 0.05)
-s10 = Slider(10, 410, 0.5)
-s11 = Slider(10, 450, 0.73)
-s12 = Slider(10, 490, 0.05)
 
-sliders = [s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11, s12]
+sliders = [s1, s2, s3, s4, s5, s6, s7, s8]
 
 # Initialize MuJoCo Model
 xml_path = "scene.xml"
@@ -69,25 +65,25 @@ context = mj.MjrContext(model, mj.mjtFontScale.mjFONTSCALE_50)
 
 # Globals
 desired_positions = np.array([
-    0.0, 0.9, -1.8, # FL
-    0.0, 0.9, -1.8, # FR
-    0.0, 0.9, -1.8, # RL
-    0.0, 0.9, -1.8  # RR
+    0.0, 0.9,  # FL
+    0.0, 0.9,  # FR
+    0.0, 0.9,  # RL
+    0.0, 0.9  # RR
 ])
 
 
 desired_slider = np.array([
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05
+    0.5, 0.73, 
+    0.5, 0.73, 
+    0.5, 0.73, 
+    0.5, 0.73 
 ])
 
 desired_slider_reset = np.array([
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05,
-    0.5, 0.73, 0.05
+    0.5, 0.73,
+    0.5, 0.73,
+    0.5, 0.73,
+    0.5, 0.73
 ])
 kp = 80.0
 kd = 2.0
@@ -105,7 +101,7 @@ def add_overlay(gridpos, text1, text2):
 
 def create_overlay(model, data):
     topleft = mj.mjtGridPos.mjGRID_TOPLEFT
-    for idx in range(12):
+    for idx in range(8):
         #add_overlay(topleft,f"slider {12 - idx}",'%.2f' % sliders[11 - idx].slider_value  # dispaly slider value
         add_overlay(topleft,f"slider {12 - idx}",'%.2f' % desired_positions[idx]  # dispaly slider value
     )
@@ -113,7 +109,7 @@ def create_overlay(model, data):
 def keyboard(window, key, scancode, act, mods):
     global desired_positions
     if (act == glfw.PRESS and key == glfw.KEY_R):
-        for i in range(12):
+        for i in range(8):
             sliders[i].slider_value = desired_slider_reset[i]
         mj.mj_resetData(model, data)
         mj.mj_forward(model, data)
@@ -131,16 +127,16 @@ def mouse_button_callback(window, button, action, mods):
         width, height = glfw.get_window_size(window)
         ypos = height - ypos
         if action == glfw.PRESS:
-            for i in range(12):
+            for i in range(8):
                 sliders[i].set_dragging_true(xpos, ypos)
             
         elif action == glfw.RELEASE:
-            for i in range(12):
+            for i in range(8):
                 sliders[i].set_dragging_false()   
 
 def mouse_move_callback(window, xpos, ypos):
     global slider_value
-    for i in range(12):
+    for i in range(8):
         if sliders[i].dragging_slider:
             width, height = glfw.get_window_size(window)
             ypos = height - ypos
@@ -176,8 +172,15 @@ while not glfw.window_should_close(window):
     time_prev = data.time
 
     # Update desired position from slider
+    #for i in range(model.nu):
+    #    desired_positions[i] = (sliders[i].slider_value - 0.5) * 4.0  # -1.0 to +1.0 radians
+    # Assuming joint order: abduction, knee, abduction, knee, ...
     for i in range(model.nu):
-        desired_positions[i] = (sliders[i].slider_value - 0.5) * 4.0  # -1.0 to +1.0 radians
+        if i % 2 == 0:  # abduction joint (e.g., hip sideways)
+            desired_positions[i] = (sliders[i].slider_value - 0.5) * 1.5  # e.g., [-0.75, 0.75]
+        else:  # knee joint
+            desired_positions[i] = -1.0 - (sliders[i].slider_value) * 1.0  # from -1 to -2
+
     print(desired_positions)
     # --- PD CONTROL ---
     for i in range(model.nu):
@@ -189,7 +192,11 @@ while not glfw.window_should_close(window):
         qvel = data.qvel[qvel_adr]
 
         #if i == 0:  # Only control actuator 0
-        pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
+        '''
+        Below code works for unitree
+        '''
+        #pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
+        pos_error = desired_positions[i] - qpos
         torque = kp * pos_error - kd * qvel
         data.ctrl[i] = torque
         #else:
@@ -219,7 +226,7 @@ while not glfw.window_should_close(window):
 
     _overlay.clear()
 
-    for i in range(12):
+    for i in range(8):
         sliders[i].draw_slide()
    
     glfw.swap_buffers(window)

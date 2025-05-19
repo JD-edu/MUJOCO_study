@@ -32,10 +32,10 @@ desired_positions = np.array([
 ])
 '''
 desired_positions = np.array([
-    0.0,  0.9,  -1.8,  # Front Left
-    0.0,  0.9,  -1.8,  # Front Right
-    0.0,  0.9,  -1.8,  # Rear Left
-    0.0,  0.9,  -1.8   # Rear Right
+    0.2,  0.5,    # Front Left
+    0.2,  0.5,    # Front Right
+    0.2,  0.5,    # Rear Left
+    0.2,  0.5,    # Rear Right
 ])
 
 # You may have 12 actuators, so shape must match model.nu
@@ -52,11 +52,10 @@ while not glfw.window_should_close(window):
 
     # --- PD CONTROL: compute torques ---
     for i in range(model.nu):
-        qpos = data.sensordata[i]        # Sensor data: joint angle
-        qvel = data.sensordata[i + model.nu]  # Sensor data: joint velocity
+        qpos = data.sensordata[i*3]        # Sensor data: joint angle
+        qvel = data.sensordata[i*3+1]  # Sensor data: joint velocity
         torque = kp * (desired_positions[i] - qpos) + kd * (0.0 - qvel)
         data.ctrl[i] = torque
-        print(data.sensordata[0])
 
     # --- Simulate ---
     while (data.time - time_prev) < (1.0/60.0):
