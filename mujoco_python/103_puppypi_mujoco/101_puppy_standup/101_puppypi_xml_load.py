@@ -203,43 +203,6 @@ print("Initial joint angles (qpos):", data.qpos[7:])
 qq = -2.7
 while not glfw.window_should_close(window):
     time_prev = data.time
-    '''
-    <sensor>
-        <actuatorpos name="lb_joint1_p" actuator="lb_joint1" />
-        <actuatorvel name="lb_joint1_v" actuator="lb_joint1" />
-        <actuatorfrc name="lb_joint1_f" actuator="lb_joint1" noise="0.001" />
-        <actuatorpos name="lb_joint2_p" actuator="lb_joint2" />
-        <actuatorvel name="lb_joint2_v" actuator="lb_joint2" />
-        <actuatorfrc name="lb_joint2_f" actuator="lb_joint2" noise="0.001" />
-        <actuatorpos name="rb_joint1_p" actuator="rb_joint1" />
-        <actuatorvel name="rb_joint1_v" actuator="rb_joint1" />
-        <actuatorfrc name="rb_joint1_f" actuator="rb_joint1" noise="0.001" />
-        <actuatorpos name="rb_joint2_p" actuator="rb_joint2" />
-        <actuatorvel name="rb_joint2_v" actuator="rb_joint2" />
-        <actuatorfrc name="rb_joint2_f" actuator="rb_joint2" noise="0.001" />
-        <actuatorpos name="rf_joint1_p" actuator="rf_joint1" />
-        <actuatorvel name="rf_joint1_v" actuator="rf_joint1" />
-        <actuatorfrc name="rf_joint1_f" actuator="rf_joint1" noise="0.001" />
-        <actuatorpos name="rf_joint2_p" actuator="rf_joint2" />
-        <actuatorvel name="rf_joint2_v" actuator="rf_joint2" />
-        <actuatorfrc name="rf_joint2_f" actuator="rf_joint2" noise="0.001" />
-        <actuatorpos name="lf_joint1_p" actuator="lf_joint1" />
-        <actuatorvel name="lf_joint1_v" actuator="lf_joint1" />
-        <actuatorfrc name="lf_joint1_f" actuator="lf_joint1" noise="0.001" />
-        <actuatorpos name="lf_joint2_p" actuator="lf_joint2" />
-        <actuatorvel name="lf_joint2_v" actuator="lf_joint2" />
-        <actuatorfrc name="lf_joint2_f" actuator="lf_joint2" noise="0.001" />
-        <framequat name="orientation" objtype="site" noise="0.001" objname="imu" />
-        <gyro name="angular-velocity" site="imu" noise="0.005" cutoff="34.9" />
-    </sensor>
-
-    Above sensor tag, parameter arrignment 
-    
-    actuatorpos
-    actuatorvel
-    actuatorfrc... 
-    So below code is different from Unitree Go2 
-    '''
     print("=======")
     #qq += 0.1
     #if qq > 2:

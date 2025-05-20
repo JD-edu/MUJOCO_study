@@ -1,4 +1,37 @@
 import mujoco as mj
+import numpy as np
+from mujoco.glfw import glfw
+
+class Slider:
+    def __init__(self, x, y, value):
+        self.slider_start_x = x
+        self.slider_start_y = y
+        self.dragging_slider = False
+        self.slider_value = value
+        self.slider_width = 200
+        self.slider_height = 20
+
+    def set_dragging_true(self, click_x, click_y):
+        if (self.slider_start_x <= click_x <= self.slider_start_x + self.slider_width) and (self.slider_start_y <= click_y <= self.slider_start_y + self.slider_height):
+                self.dragging_slider = True
+    
+    def set_dragging_false(self):
+        self.dragging_slider = False
+    
+    def set_slide_value(self, click_x):
+        new_value = (click_x - self.slider_start_x) / self.slider_width
+        self.slider_value = np.clip(new_value, 0.0, 1.0)
+
+    def draw_slide(self):
+        mj.mjr_rectangle(
+            mj.MjrRect(self.slider_start_x, self.slider_start_y, self.slider_width, self.slider_height),
+            0.4, 0.4, 0.4, 1.0
+        )
+        knob_x = int(self.slider_start_x + self.slider_value * self.slider_width) - 5
+        mj.mjr_rectangle(
+            mj.MjrRect(knob_x, self.slider_start_y - 5, 10, self.slider_height + 10),
+            0.8, 0.2, 0.2, 1.0
+        )
 
 def check_model_data(model, data):
     print("=== mj_data Overview ===")

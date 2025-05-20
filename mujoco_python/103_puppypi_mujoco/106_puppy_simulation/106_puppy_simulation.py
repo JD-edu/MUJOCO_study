@@ -2,7 +2,8 @@ import mujoco as mj
 from mujoco.glfw import glfw
 import numpy as np
 import os
-from mojoco_model_util import check_model_data
+from mujoco_model_util import check_model_data
+import math 
 
 # Initialize
 xml_path = "scene.xml"
@@ -28,11 +29,12 @@ context = mj.MjrContext(model, mj.mjtFontScale.mjFONTSCALE_150)
 # SET GOOD STANDING POSE
 
 desired_positions = np.array([
-    0.2,  0.7,    # Front Left
-    0.2,  0.7,    # Front Right
-    0.2,  0.5,    # Rear Left
-    0.2,  0.5,    # Rear Right
+    0.2,  0.7,    # lb
+    0.2,  0.7,    # rb
+    0.2,  0.5,    # rf
+    0.2,  0.5     # lf
 ])
+
 
 # You may have 12 actuators, so shape must match model.nu
 # Check: len(desired_positions) == model.nu
@@ -42,17 +44,21 @@ desired_positions = np.array([
 kp = 80.0  # Position gain
 kd = 2.0   # Damping gain
 
+
 # Main loop
 while not glfw.window_should_close(window):
     time_prev = data.time
 
+ 
+
     # --- PD CONTROL: compute torques ---
-    for i in range(model.nu):
+    for i in range(model.nu):   
         qpos = data.sensordata[i*3]        # Sensor data: joint angle
         qvel = data.sensordata[i*3+1]  # Sensor data: joint velocity
         torque = kp * (desired_positions[i] - qpos) + kd * (0.0 - qvel)
         data.ctrl[i] = torque
-
+  
+   
     # --- Simulate ---
     while (data.time - time_prev) < (1.0/60.0):
         mj.mj_step(model, data)

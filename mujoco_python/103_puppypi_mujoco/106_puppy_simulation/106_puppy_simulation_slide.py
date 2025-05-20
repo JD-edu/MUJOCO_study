@@ -2,91 +2,65 @@ import mujoco as mj
 from mujoco.glfw import glfw
 import numpy as np
 import os
+from mujoco_model_util import check_model_data, Slider
 
-class Slider:
-    def __init__(self, x, y, value):
-        self.slider_start_x = x
-        self.slider_start_y = y
-        self.dragging_slider = False
-        self.slider_value = value
-        self.slider_width = 200
-        self.slider_height = 20
-
-    def set_dragging_true(self, click_x, click_y):
-        if (self.slider_start_x <= click_x <= self.slider_start_x + self.slider_width) and (self.slider_start_y <= click_y <= self.slider_start_y + self.slider_height):
-                self.dragging_slider = True
-    
-    def set_dragging_false(self):
-        self.dragging_slider = False
-    
-    def set_slide_value(self, click_x):
-        new_value = (click_x - self.slider_start_x) / self.slider_width
-        self.slider_value = np.clip(new_value, 0.0, 1.0)
-
-    def draw_slide(self):
-        mj.mjr_rectangle(
-            mj.MjrRect(self.slider_start_x, self.slider_start_y, self.slider_width, self.slider_height),
-            0.4, 0.4, 0.4, 1.0
-        )
-        knob_x = int(self.slider_start_x + self.slider_value * self.slider_width) - 5
-        mj.mjr_rectangle(
-            mj.MjrRect(knob_x, self.slider_start_y - 5, 10, self.slider_height + 10),
-            0.8, 0.2, 0.2, 1.0
-        )
-
-    
-s1 = Slider(10, 50, 0.5)
-s2 = Slider(10, 90, 0.73)
-s3 = Slider(10, 130, 0.05)
-s4 = Slider(10, 170, 0.5)
-s5 = Slider(10, 210, 0.73)
-s6 = Slider(10, 250, 0.05)
-s7 = Slider(10, 290, 0.5)
-s8 = Slider(10, 330, 0.73)
+s1 = Slider(10, 50, 0.55)
+s2 = Slider(10, 90, 0.675)
+s3 = Slider(10, 130, 0.55)
+s4 = Slider(10, 170, 0.675)
+s5 = Slider(10, 210, 0.55)
+s6 = Slider(10, 250, 0.625)
+s7 = Slider(10, 290, 0.55)
+s8 = Slider(10, 330, 0.625)
 
 sliders = [s1, s2, s3, s4, s5, s6, s7, s8]
 
-# Initialize MuJoCo Model
+# Initialize
 xml_path = "scene.xml"
 dirname = os.path.dirname(__file__)
-abspath = os.path.join(dirname, xml_path)
+abspath = os.path.join(dirname + "/" + xml_path)
 model = mj.MjModel.from_xml_path(abspath)
 data = mj.MjData(model)
 
-# Viewer setup
-glfw.init()
-window = glfw.create_window(1000, 800, "Unitree Stand", None, None)
-glfw.make_context_current(window)
+check_model_data(model, data)
 
+# Viewer
+glfw.init()
+window = glfw.create_window(1200, 900, "PuppyPi Slider Trim", None, None)
+glfw.make_context_current(window)
 cam = mj.MjvCamera()
 opt = mj.MjvOption()
 scene = mj.MjvScene(model, maxgeom=10000)
-context = mj.MjrContext(model, mj.mjtFontScale.mjFONTSCALE_50)
+context = mj.MjrContext(model, mj.mjtFontScale.mjFONTSCALE_150)
 
-# Globals
+# Desired standing joint positions
+# desired_positions = np.zeros(model.nu)  # ← try setting to 0.0 first
+# For some robots, you need slight joint bends like
+# SET GOOD STANDING POSE
+
+joint_range = 2.0
 desired_positions = np.array([
-    0.0, 0.9,  # FL
-    0.0, 0.9,  # FR
-    0.0, 0.9,  # RL
-    0.0, 0.9  # RR
+    0.2,  0.7,     # back Left      lb_joint1   lb_joint2 
+    0.2,  0.7,     # back Right     rb_joint1   rb_joint2
+    0.2,  0.5,     # Front Left       rf_joint1   rf_joint2
+    0.2,  0.5,     # Front Right      lf_joint1   lf_joint2
 ])
 
 
-desired_slider = np.array([
-    0.5, 0.73, 
-    0.5, 0.73, 
-    0.5, 0.73, 
-    0.5, 0.73 
+slider_values = np.array([
+    0.55, 0.675,
+    0.55, 0.675,
+    0.55, 0.625,
+    0.55, 0.625
 ])
 
-desired_slider_reset = np.array([
-    0.5, 0.73,
-    0.5, 0.73,
-    0.5, 0.73,
-    0.5, 0.73
-])
-kp = 80.0
-kd = 2.0
+# You may have 12 actuators, so shape must match model.nu
+# Check: len(desired_positions) == model.nu
+
+
+# PD gains
+kp = 80.0  # Position gain
+kd = 2.0   # Damping gain
 
 # Overlay and Slider Globals
 _overlay = {}
@@ -103,23 +77,17 @@ def create_overlay(model, data):
     topleft = mj.mjtGridPos.mjGRID_TOPLEFT
     for idx in range(8):
         #add_overlay(topleft,f"slider {12 - idx}",'%.2f' % sliders[11 - idx].slider_value  # dispaly slider value
-        add_overlay(topleft,f"slider {12 - idx}",'%.2f' % desired_positions[idx]  # dispaly slider value
+        add_overlay(topleft,f"slider {idx}",'%.2f' % desired_positions[idx]  # dispaly slider value
     )
     
 def keyboard(window, key, scancode, act, mods):
-    global desired_positions
+    global desired_positions, knee, hip
     if (act == glfw.PRESS and key == glfw.KEY_R):
         for i in range(8):
-            sliders[i].slider_value = desired_slider_reset[i]
+            sliders[i].slider_value = slider_values[i]
         mj.mj_resetData(model, data)
         mj.mj_forward(model, data)
-    if act == glfw.PRESS and key == glfw.KEY_Q:
-        for i in range(model.nu):
-            desired_positions[i] += 0.05
-    if act == glfw.PRESS and key == glfw.KEY_A:
-        for i in range(model.nu):
-            desired_positions[0] -= 0.05
-
+    
 def mouse_button_callback(window, button, action, mods):
     global dragging_slider
     if button == glfw.MOUSE_BUTTON_LEFT:
@@ -164,42 +132,51 @@ def controller(model, data):
         pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
         torque = kp * pos_error - kd * qvel
         data.ctrl[i] = torque
-   
-mj.set_mjcb_control(controller)
 
-# --- Main Simulation Loop ---
+#mj.set_mjcb_control(controller)
+
+# Main loop
 while not glfw.window_should_close(window):
     time_prev = data.time
 
     # Update desired position from slider
-    #for i in range(model.nu):
-    #    desired_positions[i] = (sliders[i].slider_value - 0.5) * 4.0  # -1.0 to +1.0 radians
-    # Assuming joint order: abduction, knee, abduction, knee, ...
     for i in range(model.nu):
-        if i % 2 == 0:  # abduction joint (e.g., hip sideways)
-            desired_positions[i] = (sliders[i].slider_value - 0.5) * 1.5  # e.g., [-0.75, 0.75]
-        else:  # knee joint
-            desired_positions[i] = -1.0 - (sliders[i].slider_value) * 1.0  # from -1 to -2
-
+        desired_positions[i] = (sliders[i].slider_value - 0.5) * 2 * joint_range
+        #desired_positions[i] = (sliders[i].slider_value - 0.5) * 2 * amplitude[i]
+        #desired_positions[i] = (sliders[i].slider_value - 0.5) * 1.5  # -1.0 to +1.0 radians
+    # Assuming joint order: abduction, knee, abduction, knee, ...
+    #for i in range(model.nu):
+    #    if i % 2 == 0:  # abduction joint (e.g., hip sideways)
+    #        desired_positions[i] = (sliders[i].slider_value - 0.5) * 1.5  # e.g., [-0.75, 0.75]
+    #    else:  # knee joint
+    #        desired_positions[i] = -1.0 - (sliders[i].slider_value) * 1.0  # from -1 to -2
     print(desired_positions)
+
+   
     # --- PD CONTROL ---
     for i in range(model.nu):
-        joint_id = model.actuator_trnid[i][0]
-        qpos_adr = model.jnt_qposadr[joint_id]
-        qvel_adr = model.jnt_dofadr[joint_id]
+        #joint_id = model.actuator_trnid[i][0]
+        #qpos_adr = model.jnt_qposadr[joint_id]
+        #qvel_adr = model.jnt_dofadr[joint_id]
 
-        qpos = data.qpos[qpos_adr]
-        qvel = data.qvel[qvel_adr]
+        #qpos = data.qpos[qpos_adr]
+        #qvel = data.qvel[qvel_adr]
 
         #if i == 0:  # Only control actuator 0
         '''
         Below code works for unitree
         '''
-        pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
-        torque = kp * pos_error - kd * qvel
-        data.ctrl[i] = torque
+        #pos_error = (desired_positions[i] - qpos + np.pi) % (2 * np.pi) - np.pi
+        #torque = kp * pos_error - kd * qvel
+        #data.ctrl[i] = torque
         #else:
         #    data.ctrl[i] = 0
+        qpos = data.sensordata[i*3]        # Sensor data: joint angle
+        qvel = data.sensordata[i*3+1]  # Sensor data: joint velocity
+        torque = kp * (desired_positions[i] - qpos) + kd * (0.0 - qvel)
+        data.ctrl[i] = torque
+        #print(desired_positions)
+
 
     # --- Simulate Physics ---
     while (data.time - time_prev) < (1.0 / 60.0):

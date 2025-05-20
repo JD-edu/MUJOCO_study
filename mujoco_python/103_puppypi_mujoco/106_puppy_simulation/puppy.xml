@@ -53,7 +53,7 @@
       <geom pos="-0.012242 -8.533e-05 0.202501" quat="1 0 0 0" type="mesh" rgba="0 0 0 1" mesh="lidar_Link" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
       <geom type="mesh" rgba="0 0 0 1" mesh="lidar_Link" pos="-0.012242 -8.533e-05 0.202501" quat="1 0 0 0" />
       
-      
+      <!-- link 1 is HIP and lik 2 is KNEE-->
       <body name="lb_link1" pos="-0.0778358 0.0420726 0.125988" quat="0.657971 -0.259755 -0.259548 0.657447">
         <inertial pos="0.0139911 0.0129617 -0.0150641" quat="0.681953 0.285067 -0.259509 0.621555" mass="0.0101535" diaginertia="5.0547e-06 4.74867e-06 7.53492e-07" />
         <!-- <joint name="lb_joint1" pos="0 0 0" axis="0 0 0" range="-2 2" actuatorfrcrange="-0.5 0.5" />-->
