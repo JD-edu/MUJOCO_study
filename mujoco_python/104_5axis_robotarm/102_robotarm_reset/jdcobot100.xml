@@ -1,0 +1,110 @@
+<mujoco model="jdcobot_100_description">
+  <option iterations="50" timestep="0.001" solver="PGS" gravity="0 0 -9.81" />
+
+  <compiler angle="radian" meshdir="meshes" eulerseq="zyx" autolimits="true" />
+
+  <default>
+    <joint limited="true" damping="0.01" armature="0.01" frictionloss="0.01" />
+    <geom condim="4" contype="1" conaffinity="15" friction="0.9 0.2 0.2" solref="0.001 2" />
+    <motor ctrllimited="true" />
+    <equality solref="0.001 2" />
+    <default class="visualgeom">
+      <geom material="visualgeom" condim="1" contype="0" conaffinity="0" />
+    </default>
+  </default>
+
+  <asset>
+    <mesh name="base_link" content_type="model/stl" file="base_link.STL" />
+    <mesh name="link_1" content_type="model/stl" file="link_1.STL" />
+    <mesh name="link_2" content_type="model/stl" file="link_2.STL" />
+    <mesh name="link_3" content_type="model/stl" file="link_3.STL" />
+    <mesh name="link_4" content_type="model/stl" file="link_4.STL" />
+    <mesh name="link_5" content_type="model/stl" file="link_5.STL" />
+    <mesh name="link_6" content_type="model/stl" file="link_6.STL" />
+    <texture name="texplane" type="2d" builtin="checker" rgb1=".0 .0 .0" rgb2=".8 .8 .8" width="100" height="100" />
+    <material name="matplane" reflectance="0." texture="texplane" texrepeat="1 1" texuniform="true" />
+    <material name="visualgeom" rgba="0.5 0.9 0.2 1" />
+  </asset>
+
+  <worldbody>
+    <light directional="true" diffuse="0.4 0.4 0.4" specular="0.1 0.1 0.1" pos="0 0 5.0" dir="0 0 -1" castshadow="false" />
+    <light directional="true" diffuse="0.6 0.6 0.6" specular="0.2 0.2 0.2" pos="0 0 4" dir="0 0 -1" />
+    <!--<geom name="ground" type="plane" pos="0 0 0" size="100 100 0.001" quat="1 0 0 0" material="matplane" condim="3" conaffinity="15" />-->
+    <camera name="fixed" pos="0 -3.0 0.5484535813028795" xyaxes="1 0 0 0 0 1" />
+    <camera name="track" mode="trackcom" pos="0 -3.0 0.5484535813028795" xyaxes="1 0 0 0 0 1" />
+    <body name="root" pos="0 0 0" quat="1 0 0 0">
+      <!--<freejoint name="root" />-->
+      <site name="imu" size="0.01" pos="0 0 0" />
+      <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="base_link" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+      <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="base_link" />
+      <body name="link_1" pos="0 0 0.039955" quat="0.707105 0 0 -0.707108">
+        <inertial pos="-7.7756e-10 0.017465 0.027545" quat="0.394144 0.58707 -0.587068 0.394144" mass="0.066052" diaginertia="2.41837e-05 2.1357e-05 1.84163e-05" />
+        <joint name="joint_1" pos="0 0 0" axis="0 0 1" range="0 3.1416" />
+        <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_1" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+        <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_1" />
+        <body name="link_2" pos="0 0 0.045445" quat="0.499998 0.5 0.5 -0.500002">
+          <inertial pos="-0.000181908 0.044377 -0.00853829" quat="0.803356 0.595421 0.00736097 0.00628335" mass="0.0190273" diaginertia="8.74871e-06 8.36342e-06 1.33346e-06" />
+          <joint name="joint_2" pos="0 0 0" axis="0 0 1" range="0 3.1416" />
+          <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_2" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+          <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_2" />
+          <body name="link_3" pos="0 0.07545 0" quat="0.707105 0 0 -0.707108">
+            <inertial pos="-0.000185945 0.0453619 -0.00876236" quat="0.803777 0.594851 0.00723917 0.00651462" mass="0.0186142" diaginertia="8.71111e-06 8.32613e-06 1.32587e-06" />
+            <joint name="joint_3" pos="0 0 0" axis="0 0 1" range="0 3.1416" />
+            <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_3" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+            <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_3" />
+            <body name="link_4" pos="0 0.07545 0" quat="0.707105 0 0 -0.707108">
+              <inertial pos="0.00238355 0.040698 -0.00470574" quat="0.759182 0.648215 -0.00484139 -0.0586205" mass="0.0228196" diaginertia="6.02568e-06 5.41658e-06 1.79244e-06" />
+              <joint name="joint_4" pos="0 0 0" axis="0 0 1" range="0 3.1416" />
+              <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_4" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+              <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_4" />
+              <body name="link_5" pos="-0.00079998 0.06655 -0.01201" quat="0.499998 -0.500002 0.5 0.5">
+                <inertial pos="-2.99023e-10 -4.22195e-09 0.00251673" quat="0.5 0.5 -0.5 0.5" mass="0.000405354" diaginertia="8.33298e-09 4.75327e-09 4.75327e-09" />
+                <joint name="joint_5" pos="0 0 0" axis="0 0 1" range="0 3.1416" />
+                <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_5" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+                <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_5" />
+              </body>
+              <body name="link_6" pos="-0.007818 0.063831 0.018" quat="-2.59734e-06 -0.707108 0.707105 -2.59735e-06">
+                <inertial pos="-0.0153775 -0.0150318 0.00793841" quat="0.660368 -0.105536 -0.109745 0.735344" mass="0.00129443" diaginertia="9.38348e-08 6.19855e-08 4.57508e-08" />
+                <joint name="joint_6" pos="0 0 0" axis="0 0 1" type="slide" range="0.001 0.003" />
+                <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_6" contype="1" conaffinity="0" density="0" group="1" class="visualgeom" />
+                <geom type="mesh" rgba="0.8 0.8 0.8 1" mesh="link_6" />
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="joint_1" joint="joint_1" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+    <motor name="joint_2" joint="joint_2" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+    <motor name="joint_3" joint="joint_3" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+    <motor name="joint_4" joint="joint_4" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+    <motor name="joint_5" joint="joint_5" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+    <motor name="joint_6" joint="joint_6" ctrllimited="true" ctrlrange="-20 20" gear="1" />
+  </actuator>
+
+  <sensor>
+    <actuatorpos name="joint_1_p" actuator="joint_1" />
+    <actuatorvel name="joint_1_v" actuator="joint_1" />
+    <actuatorfrc name="joint_1_f" actuator="joint_1" noise="0.001" />
+    <actuatorpos name="joint_2_p" actuator="joint_2" />
+    <actuatorvel name="joint_2_v" actuator="joint_2" />
+    <actuatorfrc name="joint_2_f" actuator="joint_2" noise="0.001" />
+    <actuatorpos name="joint_3_p" actuator="joint_3" />
+    <actuatorvel name="joint_3_v" actuator="joint_3" />
+    <actuatorfrc name="joint_3_f" actuator="joint_3" noise="0.001" />
+    <actuatorpos name="joint_4_p" actuator="joint_4" />
+    <actuatorvel name="joint_4_v" actuator="joint_4" />
+    <actuatorfrc name="joint_4_f" actuator="joint_4" noise="0.001" />
+    <actuatorpos name="joint_5_p" actuator="joint_5" />
+    <actuatorvel name="joint_5_v" actuator="joint_5" />
+    <actuatorfrc name="joint_5_f" actuator="joint_5" noise="0.001" />
+    <actuatorpos name="joint_6_p" actuator="joint_6" />
+    <actuatorvel name="joint_6_v" actuator="joint_6" />
+    <actuatorfrc name="joint_6_f" actuator="joint_6" noise="0.001" />
+    <framequat name="orientation" objtype="site" noise="0.001" objname="imu" />
+    <gyro name="angular-velocity" site="imu" noise="0.005" cutoff="34.9" />
+  </sensor>
+</mujoco>

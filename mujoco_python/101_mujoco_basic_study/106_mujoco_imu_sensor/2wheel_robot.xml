@@ -1,0 +1,52 @@
+<mujoco>
+	<option gravity="0 0 -9.81" />
+  <visual>
+    <headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-130" elevation="-20"/>
+  </visual>
+	<worldbody>
+        <light diffuse=".5 .5 .5" pos="0 0 3" dir="0 0 -1"/>
+		<!-- <geom type="plane" size="5 5 0.1" rgba=".9 .9 .9 1"/> -->
+		<!--<body name = "chassis" pos="0 0 0.2" euler='0 90 0'>-->
+		<body name = "chassis" pos="0 0 0.2" >
+			<joint type="free"/>
+			<site name="imu_site" pos="0 0 0.1" size="0.01" rgba="1 0 0 1"/>
+			<geom type="box" size="0.8 0.4 0.1" rgba=".9 .9 0 1"/>
+			  <!-- x축 방향 site (빨강) -->
+  			<site name="x_axis" pos="1 0 0" size="0.05" rgba="1 0 0 1"/>
+
+  			<!-- y축 방향 site (녹색) -->
+  			<site name="y_axis" pos="0 0.5 0" size="0.05" rgba="0 1 0 1"/>
+
+  			<!-- z축 방향 site (파랑) -->
+  			<site name="z_axis" pos="0 0 0.5" size="0.05" rgba="0 0 1 1"/>
+			<!-- This code is for ball cast. pos[0]: -->
+			<geom name="ballcast" type="sphere" size="0.05" pos="0.5 0 -0.15" rgba="0.2 0.2 0.2 1" contype="1" conaffinity="1"/>
+			<!-- Below code has euler angle 90. pos-->
+			<body name="left-tire" pos="-0.25 0.45 0" euler='90 0 0'>
+				  <!-- 왼쪽 바퀴 y축 방향 site (노랑) -->
+  				<site name="l_x_axis" pos="0 1 0" size="0.05" rgba="1 1 0 1"/>
+
+				<joint name = "left-wheel" type="hinge" axis="0 0 -1"/>
+				<geom type="cylinder" size=".2 0.05" friction="1 0.1 0.1" rgba="0 .9 0 1"/>
+			</body>
+			<body name="right-tire" pos="-0.25 -0.45 0" euler='90 0 0'>
+				<joint name = "right-wheel" type="hinge" axis="0 0 -1"/>
+				<geom type="cylinder" size=".2 0.05"  friction="1 0.1 0.1" rgba="0 .9 0 1"/>
+			</body>
+		</body>
+	</worldbody>
+	<sensor>
+		<!-- IMU sensor enable -->
+		<accelerometer name="imu_acc" site="imu_site"/>
+  		<gyro name="imu_gyro" site="imu_site"/>
+		<framepos objtype="geom" objname="ballcast"/>
+	</sensor>
+	
+	<actuator>
+	<!-- change kv value to apply motor deviation -->
+		<velocity name="left-velocity-servo" joint="left-wheel" kv="100"/>
+		<velocity name="right-velocity-servo" joint="right-wheel" kv="200"/>
+	</actuator>
+</mujoco>
